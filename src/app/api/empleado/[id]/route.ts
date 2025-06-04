@@ -1,11 +1,10 @@
 import { prisma } from '@/libs/db'
 import { NextRequest, NextResponse } from 'next/server'
 
-interface Params {
-  params: { id: string }
-}
-
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const empleado = await prisma.empleado.findUnique({
     where: { id: Number(params.id) },
     include: { persona: true }
@@ -15,7 +14,10 @@ export async function GET(req: NextRequest, { params }: Params) {
   return NextResponse.json(empleado)
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const data = await req.json()
 
   try {
@@ -29,7 +31,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: Params) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await prisma.empleado.delete({ where: { id: Number(params.id) } })
     return NextResponse.json({ mensaje: 'Empleado eliminado' })
