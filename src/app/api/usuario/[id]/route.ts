@@ -1,11 +1,12 @@
 import { prisma } from '@/libs/db'
-import { NextResponse, NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
+function extractIdFromPath(pathname: string) {
+  return pathname.split('/').pop()
+}
+
+export async function GET(request: NextRequest) {
+  const id = extractIdFromPath(request.nextUrl.pathname)
   const usuario = await prisma.usuario.findUnique({
     where: { id: Number(id) },
     include: { persona: true, tipoUsuario: true }
@@ -15,11 +16,8 @@ export async function GET(
   return NextResponse.json(usuario)
 }
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
+export async function PUT(request: NextRequest) {
+  const id = extractIdFromPath(request.nextUrl.pathname)
   const data = await request.json()
 
   try {
@@ -33,11 +31,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
+export async function DELETE(request: NextRequest) {
+  const id = extractIdFromPath(request.nextUrl.pathname)
 
   try {
     await prisma.usuario.delete({ where: { id: Number(id) } })
