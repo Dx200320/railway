@@ -1,14 +1,11 @@
- 
 import { prisma } from '@/libs/db'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import type { RequestEvent } from 'next/server'
 
-interface Params {
-  params: { id: string }
-}
-
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(event: RequestEvent) {
+  const { id } = event.params
   const persona = await prisma.persona.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
     include: { usuario: true, empleado: true }
   })
 
@@ -16,27 +13,28 @@ export async function GET(req: NextRequest, { params }: Params) {
   return NextResponse.json(persona)
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
-  const data = await req.json()
+export async function PUT(event: RequestEvent) {
+  const { id } = event.params
+  const data = await event.request.json()
 
   try {
     const persona = await prisma.persona.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       data
     })
     return NextResponse.json(persona)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al actualizar' }, { status: 500 })
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: Params) {
+export async function DELETE(event: RequestEvent) {
+  const { id } = event.params
+
   try {
-    await prisma.persona.delete({
-      where: { id: Number(params.id) }
-    })
+    await prisma.persona.delete({ where: { id: Number(id) } })
     return NextResponse.json({ mensaje: 'Eliminado con éxito' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al eliminar' }, { status: 500 })
   }
 }
