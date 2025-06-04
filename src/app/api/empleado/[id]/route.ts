@@ -1,26 +1,31 @@
 import { prisma } from '@/libs/db'
-import { NextResponse } from 'next/server'
-import type { RequestEvent } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 
-export async function GET(event: RequestEvent) {
-  const { id } = event.params
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
   const empleado = await prisma.empleado.findUnique({
     where: { id: Number(id) },
-    include: { persona: true },
+    include: { persona: true }
   })
 
   if (!empleado) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
   return NextResponse.json(empleado)
 }
 
-export async function PUT(event: RequestEvent) {
-  const { id } = event.params
-  const data = await event.request.json()
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
+  const data = await request.json()
 
   try {
     const empleado = await prisma.empleado.update({
       where: { id: Number(id) },
-      data,
+      data
     })
     return NextResponse.json(empleado)
   } catch {
@@ -28,8 +33,11 @@ export async function PUT(event: RequestEvent) {
   }
 }
 
-export async function DELETE(event: RequestEvent) {
-  const { id } = event.params
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
 
   try {
     await prisma.empleado.delete({ where: { id: Number(id) } })

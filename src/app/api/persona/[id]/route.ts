@@ -1,9 +1,11 @@
 import { prisma } from '@/libs/db'
-import { NextResponse } from 'next/server'
-import type { RequestEvent } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 
-export async function GET(event: RequestEvent) {
-  const { id } = event.params
+export async function GET(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
   const persona = await prisma.persona.findUnique({
     where: { id: Number(id) },
     include: { usuario: true, empleado: true }
@@ -13,9 +15,12 @@ export async function GET(event: RequestEvent) {
   return NextResponse.json(persona)
 }
 
-export async function PUT(event: RequestEvent) {
-  const { id } = event.params
-  const data = await event.request.json()
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
+  const data = await request.json()
 
   try {
     const persona = await prisma.persona.update({
@@ -28,8 +33,11 @@ export async function PUT(event: RequestEvent) {
   }
 }
 
-export async function DELETE(event: RequestEvent) {
-  const { id } = event.params
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params
 
   try {
     await prisma.persona.delete({ where: { id: Number(id) } })
