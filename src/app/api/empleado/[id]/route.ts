@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { id } = context.params
   const empleado = await prisma.empleado.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
     include: { persona: true }
   })
 
@@ -16,13 +17,14 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { id } = context.params
   const data = await req.json()
 
   try {
     const empleado = await prisma.empleado.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(id) },
       data
     })
     return NextResponse.json(empleado)
@@ -33,10 +35,11 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { id } = context.params
   try {
-    await prisma.empleado.delete({ where: { id: Number(params.id) } })
+    await prisma.empleado.delete({ where: { id: Number(id) } })
     return NextResponse.json({ mensaje: 'Empleado eliminado' })
   } catch {
     return NextResponse.json({ error: 'Error al eliminar' }, { status: 500 })
