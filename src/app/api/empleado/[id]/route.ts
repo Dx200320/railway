@@ -1,31 +1,26 @@
 import { prisma } from '@/libs/db'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import type { RequestEvent } from 'next/server'
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
+export async function GET(event: RequestEvent) {
+  const { id } = event.params
   const empleado = await prisma.empleado.findUnique({
     where: { id: Number(id) },
-    include: { persona: true }
+    include: { persona: true },
   })
 
   if (!empleado) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
   return NextResponse.json(empleado)
 }
 
-export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
-  const data = await req.json()
+export async function PUT(event: RequestEvent) {
+  const { id } = event.params
+  const data = await event.request.json()
 
   try {
     const empleado = await prisma.empleado.update({
       where: { id: Number(id) },
-      data
+      data,
     })
     return NextResponse.json(empleado)
   } catch {
@@ -33,11 +28,9 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params
+export async function DELETE(event: RequestEvent) {
+  const { id } = event.params
+
   try {
     await prisma.empleado.delete({ where: { id: Number(id) } })
     return NextResponse.json({ mensaje: 'Empleado eliminado' })
